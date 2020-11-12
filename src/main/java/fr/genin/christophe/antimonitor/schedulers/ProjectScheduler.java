@@ -76,7 +76,7 @@ public class ProjectScheduler {
                 .flatMap(id -> rawService.setTreatementForId(id, Treatments.TABLES))
                 .subscribe()
                 .with(
-                        id -> LOGGER.debug("Changed state  to version for " + id),
+                        id -> LOGGER.info("Changed state  to version for " + id),
                         ex -> {
                             if (ex instanceof EmptyQueueException) {
                                 return;

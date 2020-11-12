@@ -43,6 +43,7 @@ public class Versions {
                 .put("isSnapshot", snapshot)
                 .put("javaDeps", javaDeps)
                 .put("tables", tables)
-                .put("urls", urls);
+                .put("apis", urls)
+                .put("latestUpdate", raw.update);
     }
 }

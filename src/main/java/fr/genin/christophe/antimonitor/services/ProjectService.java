@@ -1,5 +1,6 @@
 package fr.genin.christophe.antimonitor.services;
 
+import fr.genin.christophe.antimonitor.DbUtils;
 import fr.genin.christophe.antimonitor.domain.adapters.Project;
 import fr.genin.christophe.antimonitor.domain.adapters.exception.NoProjectFoundException;
 import fr.genin.christophe.antimonitor.jooq.JooqFactory;
@@ -11,11 +12,7 @@ import io.vertx.mutiny.sqlclient.RowIterator;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static fr.genin.christophe.antimonitor.jooq.generated.Tables.PROJECTS;
 
@@ -49,11 +46,6 @@ public class ProjectService {
     public Uni<List<Project>> findAll() {
         return jooqFactory.preparedQuery(dsl -> dsl.select(PROJECTS.ID, PROJECTS.NAME, PROJECTS.DOCUMENT)
                 .from(PROJECTS))
-                .onItem().transform(rowSet ->
-                        StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(rowSet.iterator(), Spliterator.ORDERED),
-                        false)
-                        .map(ROW_TO_PROJECT)
-                        .collect(Collectors.toList()));
+                .onItem().transform(DbUtils.rowsetTo(ROW_TO_PROJECT));
     }
 }

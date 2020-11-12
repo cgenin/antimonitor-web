@@ -1,5 +1,6 @@
 package fr.genin.christophe.antimonitor.services;
 
+import fr.genin.christophe.antimonitor.DbUtils;
 import fr.genin.christophe.antimonitor.domain.DomainUtils;
 import fr.genin.christophe.antimonitor.domain.WebApplications;
 import fr.genin.christophe.antimonitor.domain.adapters.WebApplicationRaw;
@@ -25,7 +26,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static fr.genin.christophe.antimonitor.jooq.generated.Tables.WEB_APPLICATION_QUEUE;
 
@@ -100,10 +100,7 @@ public class WebAppsService implements WebApplicationInsert {
                         .orderBy(WEB_APPLICATION_QUEUE.CREATED_AT)
         )
                 .toMulti()
-                .map(rowSet -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                        rowSet.iterator(), Spliterator.ORDERED),
-                        false))
-                .flatMap(stream -> Multi.createFrom().items(stream))
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
                 .map(ROW_TO_DOMAIN);
 
     }
@@ -204,10 +201,7 @@ public class WebAppsService implements WebApplicationInsert {
                         )
         )
                 .toMulti()
-                .map(rowSet -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                        rowSet.iterator(), Spliterator.ORDERED),
-                        false))
-                .flatMap(stream -> Multi.createFrom().items(stream))
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
                 .map(ROW_TO_DOMAIN);
     }
 

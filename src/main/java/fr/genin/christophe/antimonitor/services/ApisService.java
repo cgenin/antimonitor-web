@@ -25,13 +25,20 @@ public class ApisService {
     public static final Function<RowSet<Row>, Publisher<? extends JsonObject>> ROW_JSONOBJECT = rowSet -> Multi.createFrom().items(StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(rowSet.iterator(), Spliterator.ORDERED),
             false))
-            .map(row -> new JsonObject(row.getString(APIS.DOCUMENT.getName())));
+            .map(row -> {
+                final String path = row.getString(APIS.FULLURL.getName());
+                final String method = row.getString(APIS.METHOD.getName());
+                return new JsonObject(row.getString(APIS.DOCUMENT.getName()))
+                        .put("path", path)
+                        .put("method", method)
+                        ;
+            });
     @Inject
     JooqFactory jooqFactory;
 
     public Multi<JsonObject> findAll() {
         return jooqFactory.preparedQuery(
-                dsl -> dsl.select(APIS.DOCUMENT)
+                dsl -> dsl.select(APIS.FULLURL, APIS.METHOD, APIS.DOCUMENT)
                         .from(APIS)
                         .orderBy(APIS.FULLURL, APIS.METHOD, APIS.IDPROJECT)
         )
@@ -44,7 +51,7 @@ public class ApisService {
         int offset = (Objects.nonNull(queryOffset)) ? queryOffset : 0;
 
         return jooqFactory.preparedQuery(
-                dsl -> dsl.select(APIS.DOCUMENT)
+                dsl -> dsl.select(APIS.FULLURL, APIS.METHOD, APIS.DOCUMENT)
                         .from(APIS)
                         .orderBy(APIS.FULLURL, APIS.METHOD, APIS.IDPROJECT)
                         .limit(limit)

@@ -1,5 +1,6 @@
 package fr.genin.christophe.antimonitor.services;
 
+import fr.genin.christophe.antimonitor.DbUtils;
 import fr.genin.christophe.antimonitor.domain.adapters.Version;
 import fr.genin.christophe.antimonitor.jooq.JooqFactory;
 import io.smallrye.mutiny.Multi;
@@ -10,15 +11,13 @@ import io.vertx.mutiny.sqlclient.Row;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
 
 import static fr.genin.christophe.antimonitor.jooq.generated.Tables.VERSIONS;
 
 @ApplicationScoped
 public class VersionService {
+
 
     public static final Function<Row, Version> ROW_TO_DOMAIN = row -> {
         final String id = row.getString(VERSIONS.ID.getName());
@@ -37,12 +36,24 @@ public class VersionService {
                 .where(VERSIONS.IDPROJECT.eq(idProject).and(VERSIONS.NAME.eq(version)))
                 .limit(1)
         )
-                .flatMap(rowset -> Multi.createFrom().items(
-                        StreamSupport.stream(
-                                Spliterators.spliteratorUnknownSize(rowset.iterator(), Spliterator.ORDERED),
-                                false)
-                )
-                        .map(ROW_TO_DOMAIN)
-                        .collectItems().asList());
+                .toMulti()
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
+                .map(ROW_TO_DOMAIN)
+                .collectItems().asList();
+    }
+
+    public Multi<JsonObject> findByIdProject(String idProject) {
+        return jooqFactory.preparedQuery(dsl -> dsl.select()
+                .from(VERSIONS)
+                .where(VERSIONS.IDPROJECT.eq(idProject))
+                .orderBy(VERSIONS.NAME.desc())
+        ).toMulti()
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
+                .map(row -> {
+                    final String id = row.getString(VERSIONS.ID.getName());
+                    final String document = row.getString(VERSIONS.DOCUMENT.getName());
+                    final String name = row.getString(VERSIONS.NAME.getName());
+                    return new JsonObject(document).put("name", name).put("id", id);
+                });
     }
 }

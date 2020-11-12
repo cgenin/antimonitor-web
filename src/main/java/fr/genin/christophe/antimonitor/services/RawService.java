@@ -1,5 +1,6 @@
 package fr.genin.christophe.antimonitor.services;
 
+import fr.genin.christophe.antimonitor.DbUtils;
 import fr.genin.christophe.antimonitor.domain.adapters.Raw;
 import fr.genin.christophe.antimonitor.domain.adapters.Treatments;
 import fr.genin.christophe.antimonitor.domain.adapters.exception.EmptyQueueException;
@@ -14,9 +15,6 @@ import io.vertx.mutiny.sqlclient.SqlResult;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.StreamSupport;
 
 import static fr.genin.christophe.antimonitor.jooq.generated.Tables.QUEUE;
 
@@ -76,12 +74,7 @@ public class RawService {
                 .offset(offset)
         )
                 .toMulti()
-                .flatMap(rows -> Multi.createFrom().items(
-                        StreamSupport.stream(
-                                Spliterators.spliteratorUnknownSize(rows.iterator(), Spliterator.ORDERED),
-                                false)
-                        )
-                )
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
                 .map(row -> row.getString(QUEUE.DOCUMENT.getName()))
                 .map(JsonObject::new);
 
