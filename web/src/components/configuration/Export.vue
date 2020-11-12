@@ -1,61 +1,36 @@
 <template>
   <div class="export-page">
     <div class="row sm-gutter">
-      <div class="col-md-6 row justify-center">
-        <a class="none" ref="link" href="/api/configuration/db/export.json" target="_blank">export</a>
-        <q-btn @click="doExportJson" icon="file_download" color="primary">Exporter sous format JSON
-        </q-btn>
-      </div>
-      <div class="col-md-6 row justify-center">
-
-        <q-btn @click="doExportToMysqlEvents" icon="file_download" color="positive">Archivage des
-          évènements
-        </q-btn>
+      <div class="col-md-6 buttons">
+        <button-export type="projects" label="Export des projets"></button-export>
+        <button-export type="tables" label="Export des tables"></button-export>
+        <button-export type="apis" label="Export des Apis"></button-export>
+        <button-export type="dependencies" label="Export des Dépendances"></button-export>
+        <button-export type="web-apps" label="Export des applications web"></button-export>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-  import Vue from 'vue'
-  import Component from 'vue-class-component';
-  import {namespace} from 'vuex-class';
-  import {migrateEvents, nameModule} from '../../store/mysql/constants';
-  import {error, success} from '../../Toasts';
+import Vue from 'vue'
+import Component from 'vue-class-component';
+import ButtonExport from './ButtonExport';
 
-  const module = namespace(nameModule);
-
-  @Component
-  export default class ConfigurationExport extends Vue {
-    @module.Action(migrateEvents) migrateEvents: () => Promise<any>;
-
-    doExportJson() {
-      const link = this.$refs.link;
-      const l = <HTMLElement>link;
-      l.click();
-    }
-
-    doExportToMysqlEvents() {
-      this.migrateEvents()
-        .then((result) => {
-          console.log(result);
-          success(`Migration effectuée avec succès pour ${result.numberOfExported}`);
-        })
-        .catch((err) => {
-          error(err);
-        });
-    }
-  }
+@Component({ components: { ButtonExport } })
+export default class ConfigurationExport extends Vue {
+}
 
 </script>
 <style scoped>
-  .export-page {
-    margin-top: 2em;
-    width: 100%;
-  }
+.export-page {
+  margin-top: 2em;
+  width: 100%;
+}
 
-  .none {
-    display: none;
-  }
-
+.export-page .buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
 </style>
 

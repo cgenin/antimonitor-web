@@ -1,16 +1,6 @@
 <template>
   <div class="reset-page">
     <q-list>
-      <q-list-header>Mysql</q-list-header>
-      <q-item>
-        <div>
-          <div class="column items-start">
-            <p>Création des tables et réinitialisation</p>
-            <q-btn icon="create" color="secondary" @click="doCreateSchemaMysql">Créer</q-btn>
-          </div>
-        </div>
-      </q-item>
-      <q-item-separator/>
       <q-list-header>Suppression des données calculées de nitrite</q-list-header>
       <q-item class="column items-start">
         <p>Cette option permet de supprimer les données calculées sur la base nitrite.</p>
@@ -61,35 +51,17 @@
   import Vue from 'vue';
   import Component from 'vue-class-component';
   import {namespace} from 'vuex-class';
-  import {createSchema, nameModule as namespaceMysql} from '../../store/mysql/constants';
   import {clearDatas, deletedCollections, nameModule as namespaceServer, remove} from '../../store/server/constants';
   import {error, success} from '../../Toasts';
-  import {CreationSchemaResult} from '../../store/mysql/types';
 
-  const mysqlStore = namespace(namespaceMysql);
   const serverStore = namespace(namespaceServer);
 
   @Component
   export default class ConfigurationReset extends Vue {
     showResultOfClearing = false;
     @serverStore.Getter(deletedCollections) deletedCollections;
-    @mysqlStore.Action(createSchema) createSchema: () => Promise<CreationSchemaResult>;
     @serverStore.Action(clearDatas) clearDatas: () => Promise<void>;
     @serverStore.Action(remove) remove: () => Promise<void>;
-
-    doCreateSchemaMysql() {
-      this.createSchema()
-        .then((res) => {
-          if (res.creation) {
-            success(`Nombre de migrations effectuées : ${res.report.nbMigration}`);
-          } else {
-            success('Impossible d\'exécuter la requête');
-          }
-        })
-        .catch((err) => {
-          error(err);
-        });
-    }
 
     doReset() {
       this.remove()

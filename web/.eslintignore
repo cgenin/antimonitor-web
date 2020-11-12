@@ -1,3 +1,4 @@
 /dist
 quasar.conf.js
 package.json
+**/*.ts

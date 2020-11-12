@@ -7,12 +7,10 @@ import hotupdate from './hotupdate';
 import configuration from './configuration/index';
 import console from './console/index';
 import server from './server/index';
-import mysql from './mysql/index';
 import microservices from './microservices/index';
 import dependencies from './dependencies';
 import fronts from './fronts/index';
 import moniThor from './moniThor/index';
-import {module} from "./index";
 
 Vue.use(Vuex);
 
@@ -27,7 +25,6 @@ export default function () {
       configuration,
       console,
       server,
-      mysql,
       microservices,
       moniThor,
       dependencies,

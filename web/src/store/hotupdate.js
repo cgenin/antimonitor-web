@@ -12,10 +12,6 @@ export default function (store) {
       const newShowcase = require('./server').default;
       store.hotUpdate({ modules: { server: newShowcase } });
     });
-    module.hot.accept(['./mysql'], () => {
-      const newShowcase = require('./mysql').default;
-      store.hotUpdate({ modules: { mysql: newShowcase } });
-    });
     module.hot.accept(['./moniThor'], () => {
       const newShowcase = require('./moniThor').default;
       store.hotUpdate({ modules: { moniThor: newShowcase } });

@@ -1,6 +1,9 @@
 package fr.genin.christophe.antimonitor.services;
 
+import fr.genin.christophe.antimonitor.DbUtils;
+import fr.genin.christophe.antimonitor.domain.adapters.Dependency;
 import fr.genin.christophe.antimonitor.jooq.JooqFactory;
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -13,6 +16,20 @@ public class DependenciesService {
 
     @Inject
     JooqFactory jooqFactory;
+
+    public Multi<Dependency> findAll() {
+        return jooqFactory.preparedQuery(dsl->
+                dsl.select(DEPENDENCIES.RESOURCE, DEPENDENCIES.USED_BY)
+                        .from(DEPENDENCIES)
+
+        ).toMulti()
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
+                .map(row ->{
+                    final String resource = row.getString(DEPENDENCIES.RESOURCE.getName());
+                    final String usedBy = row.getString(DEPENDENCIES.USED_BY.getName());
+                    return new Dependency(resource, usedBy) ;
+                });
+    }
 
     public Uni<Boolean> deleteByUsedBy(String usedBy) {
         return jooqFactory.preparedQuery(dsl ->
