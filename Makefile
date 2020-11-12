@@ -5,7 +5,7 @@
 server/target: web/dist
 	@echo "package Fat Jar"
 	rm -Rf src/main/resources/META-INF/resources
-	mv web/dist/spa-mat src/main/resources/META-INF/resources
+	mv web/dist/spa src/main/resources/META-INF/resources
 	mvn clean install
 
 clean:

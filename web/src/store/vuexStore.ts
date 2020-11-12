@@ -1,19 +1,18 @@
 /* eslint-disable global-require */
 import Vue from 'vue';
-import Vuex, {StoreOptions} from 'vuex';
-import {RootState} from './types';
+import Vuex, { StoreOptions } from 'vuex';
+import { RootState } from './types';
 import hotupdate from './hotupdate';
 // we first import the module
 import configuration from './configuration/index';
 import console from './console/index';
-import server from './server/index';
+import server from './server';
 import microservices from './microservices/index';
 import dependencies from './dependencies';
 import fronts from './fronts/index';
 import moniThor from './moniThor/index';
 
 Vue.use(Vuex);
-
 
 export default function () {
   const data: StoreOptions<RootState> = {
@@ -28,8 +27,8 @@ export default function () {
       microservices,
       moniThor,
       dependencies,
-      fronts,
-    },
+      fronts
+    }
   };
 
   const store = new Vuex.Store<RootState>(data);
@@ -39,5 +38,6 @@ export default function () {
 // code with "process.env.DEV" -- so this doesn't
 // get into our production build (and it shouldn't).
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return hotupdate(store);
 }

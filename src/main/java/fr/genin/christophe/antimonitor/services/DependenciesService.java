@@ -37,4 +37,23 @@ public class DependenciesService {
         )
                 .map(rowset -> rowset.rowCount() > 0);
     }
+
+    public Multi<String> findAllResource(){
+        return jooqFactory.preparedQuery(dsl->
+                dsl.select(DEPENDENCIES.RESOURCE).from(DEPENDENCIES).groupBy(DEPENDENCIES.RESOURCE).orderBy(DEPENDENCIES.RESOURCE)
+        ).toMulti()
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
+                .map(row->row.getString(DEPENDENCIES.RESOURCE.getName()));
+    }
+
+    public Multi<String> usedBy(String resource){
+        return jooqFactory.preparedQuery(dsl->
+                dsl.select(DEPENDENCIES.USED_BY).from(DEPENDENCIES)
+                        .where(DEPENDENCIES.RESOURCE.eq(resource))
+                        .groupBy(DEPENDENCIES.USED_BY)
+                        .orderBy(DEPENDENCIES.USED_BY)
+        ).toMulti()
+                .flatMap(DbUtils.ROWSET_TO_MULTI_ROW)
+                .map(row->row.getString(DEPENDENCIES.USED_BY.getName()));
+    }
 }

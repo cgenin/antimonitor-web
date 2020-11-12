@@ -3,6 +3,12 @@ export interface LabelDataTable {
   value: string
 }
 
+export type Option = LabelDataTable;
+
+export interface OptionWithStamp extends Option {
+  stamp
+}
+
 export interface Pagination {
   rowsPerPage: number
 }
@@ -16,7 +22,7 @@ export const separatorOptions: LabelDataTable[] = [
   {label: 'Cellule', value: 'cell'},
   {label: 'Aucun', value: 'none'},
 ];
-export const pagination:Pagination = {
+export const pagination: Pagination = {
   rowsPerPage: 30,
 };
 export const rowsPerPageOptions = [30, 50, 80, 100, 250, 500];

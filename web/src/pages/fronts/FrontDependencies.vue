@@ -2,83 +2,89 @@
   <div class="dependencies-page page-list container">
     <header-app :bc-datas="[{icon:'link', label:'Dépendances service -> front'}]"></header-app>
     <q-card>
-      <q-card-title>
+      <q-card-section>
         <h3>Dépendances service -> front</h3>
-      </q-card-title>
-      <q-card-separator/>
-      <q-card-main>
+      </q-card-section>
+      <q-separator/>
+      <q-card-section>
         <div class="noprint row inputs">
           <div class="label-container col-sm-2 col-xs-12">
             <label>Les projets qui nécessitent</label>
           </div>
-          <q-field class="col-sm-7 col-xs-12" icon="search">
-            <q-input color="secondary" v-model="terms"
-                     placeholder="Sélectionner la ressource">
-              <q-autocomplete
-                @search="search"
-                :min-characters="1"
-                @selected="selected"
-              />
-            </q-input>
-          </q-field>
+
+          <q-select
+            class="col-sm-7 col-xs-12"
+            color="secondary"
+            placeholder="Sélectionner la ressource"
+            filled
+            :value="terms"
+            use-input
+            hide-selected
+            fill-input
+            input-debounce="0"
+            :options="options"
+            @filter="search"
+            @input="selected"
+          />
           <div class="row col-sm-2 col-xs-12">
             <q-btn class="btn-flat-primary full-width" @click="reset" flat>Reset</q-btn>
           </div>
         </div>
-      </q-card-main>
+      </q-card-section>
     </q-card>
 
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import {namespace} from 'vuex-class';
-  import filter from 'quasar-framework/src/utils/filter';
-  import HeaderApp from '../../components/HeaderApp';
-  import {FrontDependencies} from '../../Routes';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {namespace} from 'vuex-class';
+import HeaderApp from '../../components/HeaderApp.vue';
+import {FrontDependencies} from 'src/Routes';
 
-  import {loadServices, nameModule, services} from '../../store/fronts/constants';
+import {loadServices, nameModule, services} from 'src/store/fronts/constants';
 
-  const fronts = namespace(nameModule);
+const fronts = namespace(nameModule);
 
-  @Component({
-    components: {
-      HeaderApp,
-    },
-  })
-  export default class FrontDependenciesPage extends Vue {
+@Component({
+  components: {
+    HeaderApp,
+  },
+})
+export default class FrontDependenciesPage extends Vue {
+  terms: string = null;
+  options: string[] =[];
+  @fronts.Getter(services) services: string[];
+  @fronts.Action(loadServices) loadServices: () => Promise<void>;
 
-    terms: string = null;
-    @fronts.Getter(services) services;
-    @fronts.Action(loadServices) loadServices;
-
-    search(terms, done) {
+  search(terms: string, update: (Function) => void) {
+    update(() => {
       const t = terms.toUpperCase();
-      done(filter(t, {field: 'value', list: this.services}));
-    }
+      this.options = this.services.filter(s => s.toUpperCase().indexOf(t) > -1);
+    });
+  }
 
-    selected(result) {
-      this.$router.push(`${FrontDependencies}/search/${result.value.toUpperCase()}`);
-    }
+  async selected(result: string) {
+    console.log(result)
+    await this.$router.push(`${FrontDependencies}/search/${result.toUpperCase()}`);
+  }
 
-    reset() {
-      this.terms = '';
-      this.$router.push((FrontDependencies));
-    }
+  async reset() {
+    this.terms = '';
+    this.options = [];
+    await this.$router.push((FrontDependencies));
+  }
 
-    mounted() {
-      this.loadServices()
-        .then(() => {
-          const {resource} = (<any>this.$router).history.current.params;
-          if (resource) {
-            this.terms = resource;
-          }
-        });
+  async mounted() {
+    await this.loadServices();
+    const {resource} = (<any> this.$router).history.current.params;
+    if (resource) {
+      this.terms = resource;
     }
-  };
+  }
+}
 </script>
 <style lang="stylus">
-  @import "../../css/pages/dependencies.styl"
+@import "../../css/pages/dependencies.styl"
 </style>

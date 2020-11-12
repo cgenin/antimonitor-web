@@ -12,7 +12,7 @@ export const state: FrontsState = {
 };
 
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 const fronts: Module<FrontsState, RootState> = {
   namespaced,

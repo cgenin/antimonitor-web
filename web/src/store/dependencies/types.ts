@@ -1,11 +1,14 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Dependencies {
+  [key: string]: string[];
+}
+
+
 export interface DependenciesState {
   dependencies: Dependencies,
   resources: string[],
 }
 
-export interface Dependencies {
-
-}
 
 export class ResourceDto {
   public label: string;
@@ -17,4 +20,9 @@ export class ResourceDto {
     this.value = label;
     this.sublabel = sublabel;
   }
+}
+
+export interface UpdateOneDependency {
+  resource: string
+  content: any
 }

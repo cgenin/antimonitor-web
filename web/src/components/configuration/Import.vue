@@ -17,8 +17,8 @@
   import Vue from 'vue'
   import Component from 'vue-class-component';
   import {namespace} from 'vuex-class';
-  import {importDb, nameModule} from '../../store/server/constants';
-  import {error, success} from '../../Toasts';
+  import {importDb, nameModule} from 'src/store/server/constants';
+  import {error, success} from 'src/Toasts';
 
   const server = namespace(nameModule);
   @Component

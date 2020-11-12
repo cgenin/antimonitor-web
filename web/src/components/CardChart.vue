@@ -5,12 +5,12 @@
   import Vue from 'vue'
   import Component from 'vue-class-component';
   import Chart from 'chart.js';
-  import {Prop, Watch} from "vue-property-decorator";
+  import {Prop, Watch} from 'vue-property-decorator';
 
   @Component
   export default class CardChart extends Vue {
-    chart: any = '';
-    @Prop({type: Object, required: true,}) data?: any;
+    chart: Chart = undefined;
+    @Prop({type: Object, required: true}) data?: any;
     @Prop({default: 'bar'}) type: string;
     @Prop({default: 'Graph'}) cardTitle: string;
 
@@ -21,7 +21,9 @@
 
     @Watch('type')
     onChangeType() {
-      this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+      }
       this.startChart();
     }
 
@@ -59,7 +61,7 @@
 
     startChart() {
       this.chart = new Chart(
-        this.$refs.chart,
+        this.$refs.chart as HTMLCanvasElement,
         {
           type: this.type,
           data: this.dataForChart,

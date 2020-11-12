@@ -41,8 +41,7 @@
 
   @Component
   export default class Error404 extends Vue {
-
-    canGoBack: boolean = false;
+    canGoBack = false;
 
     goBack() {
       window.history.go(-1);

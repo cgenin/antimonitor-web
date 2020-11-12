@@ -11,7 +11,7 @@ export const state: ConsoleState = {
   isListening: false
 };
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 const console: Module<ConsoleState, RootState> = {
   namespaced,

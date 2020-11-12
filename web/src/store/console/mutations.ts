@@ -12,7 +12,7 @@ export const mutations: MutationTree<ConsoleState> = {
   [CLEAR](state) {
     state.messages = [];
   },
-  [SET_LISTENNING](state, listen) {
+  [SET_LISTENNING](state, listen:boolean) {
     state.isListening = listen;
   },
 };

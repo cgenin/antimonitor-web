@@ -1,8 +1,8 @@
 import {ActionTree} from 'vuex';
 import { loadResume, loadServices, findByService, reset } from './constants';
 import { SET_RESUME, SET_SERVICES, SET_FRONTS } from './mutations-type';
-import {FrontsState} from "./types";
-import {RootState} from "../types";
+import {FrontsState} from './types';
+import {RootState} from '../types';
 
 export const actions: ActionTree<FrontsState, RootState> = {
 
@@ -26,7 +26,7 @@ export const actions: ActionTree<FrontsState, RootState> = {
     commit(SET_FRONTS, []);
     return Promise.resolve({});
   },
-  [findByService]({ commit }, service) {
+  [findByService]({ commit }, service:string) {
     return fetch(`/api/fronts/by/${service}`)
       .then(res => res.json())
       .then((content) => {

@@ -1,4 +1,12 @@
 /dist
 quasar.conf.js
 package.json
-**/*.ts
+/src-bex/www
+/src-capacitor
+/src-cordova
+/.quasar
+/node_modules
+/src-ssr
+/src/store/hotupdate.js
+/src/components/VueMarkdown.js
+/src/components/charts/*.js

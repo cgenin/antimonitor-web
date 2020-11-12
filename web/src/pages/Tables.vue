@@ -2,29 +2,29 @@
   <div class="tables-page container">
     <header-app :bc-datas="[{icon:'border_all', label:'Tables'}]"></header-app>
     <q-card>
-      <q-card-main>
+      <q-card-section>
 
         <div class=" bg-light">
-          <q-tabs inverted>
+          <q-tabs
+            align="left"
+            class="bg-white">
             <q-route-tab icon="view_list" label="Liste des tables"
-                         :to="TablesList" color="primary"
-                         slot="title">
+                         :to="TablesList" color="primary">
             </q-route-tab>
             <q-route-tab icon="show_chart" label="Graphique"
-                         :to="TablesCharts" color="primary"
-                         slot="title">
+                         :to="TablesCharts" color="primary">
             </q-route-tab>
           </q-tabs>
         </div>
         <router-view/>
-      </q-card-main>
+      </q-card-section>
     </q-card>
   </div>
 </template>
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import HeaderApp from '../components/HeaderApp';
+  import HeaderApp from '../components/HeaderApp.vue';
   import { TablesCharts, TablesList } from '../Routes';
 
   @Component({

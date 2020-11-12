@@ -61,7 +61,11 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-vertx-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
@@ -93,6 +97,15 @@
             <artifactId>postgresql</artifactId>
         </dependency>
 
+        <!-- build native errors -->
+        <dependency>
+            <groupId>jakarta.security.jacc</groupId>
+            <artifactId>jakarta.security.jacc-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -126,6 +139,19 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jboss.jandex</groupId>
+                <artifactId>jandex-maven-plugin</artifactId>
+                <version>1.0.8</version>
+                <executions>
+                    <execution>
+                        <id>make-index</id>
+                        <goals>
+                            <goal>jandex</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus-plugin.version}</version>
@@ -137,7 +163,12 @@
                             <goal>build</goal>
                         </goals>
                     </execution>
+
                 </executions>
+                <configuration>
+                    <enableHttpUrlHandler>true</enableHttpUrlHandler>
+                    <additionalBuildArgs>--report-unsupported-elements-at-runtime</additionalBuildArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

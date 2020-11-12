@@ -11,9 +11,9 @@
 <script lang="ts">
   import Vue from 'vue';
   import Component from 'vue-class-component';
-  import BreadCrumb from './BreadCrumb';
-  import HelpButton from './HelpButton';
-  import {Prop} from "vue-property-decorator";
+  import BreadCrumb from './BreadCrumb.vue';
+  import HelpButton from './HelpButton.vue';
+  import {Prop} from 'vue-property-decorator';
 
   @Component({
     components: {

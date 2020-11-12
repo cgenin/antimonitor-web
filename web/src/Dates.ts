@@ -1,4 +1,5 @@
-function twoDigits(v: any): String {
+function twoDigits(v: any): string {
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   const value = `${v}`;
   return (value.length === 1) ? `0${value}` : value;
 }

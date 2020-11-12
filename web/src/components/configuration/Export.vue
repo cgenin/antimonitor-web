@@ -1,6 +1,6 @@
 <template>
   <div class="export-page">
-    <div class="row sm-gutter">
+    <div class="row q-gutter-sm">
       <div class="col-md-6 buttons">
         <button-export type="projects" label="Export des projets"></button-export>
         <button-export type="tables" label="Export des tables"></button-export>
@@ -14,7 +14,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component';
-import ButtonExport from './ButtonExport';
+import ButtonExport from './ButtonExport.vue';
 
 @Component({ components: { ButtonExport } })
 export default class ConfigurationExport extends Vue {
@@ -31,6 +31,7 @@ export default class ConfigurationExport extends Vue {
   width: 100%;
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
 }
 </style>
 

@@ -11,11 +11,14 @@ export const actions: ActionTree<ConsoleState, RootState> = {
     if (!isListenning) {
       isListenning = true;
       commit(SET_LISTENNING, true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const eb = new EventBus(`http://${window.location.host}/eventbus`, {server: ''});
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       eb.enableReconnect(true);
       eb.onopen = () => {
         const messageConnected: Message = {date: new Date().getTime(), msg: 'Console connecté'};
         commit(ADD_MESSAGE, messageConnected);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         eb.registerHandler('console.text', (error, message) => {
           if (error) {
             console.error(error);

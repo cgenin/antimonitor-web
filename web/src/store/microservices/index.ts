@@ -13,7 +13,7 @@ export const state: MicroServiceState = {
   versions: [] as Version[],
 };
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 const microservices: Module<MicroServiceState, RootState> = {
   namespaced,

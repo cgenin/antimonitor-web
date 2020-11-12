@@ -1,8 +1,8 @@
 import {GetterTree} from 'vuex';
-import {format, formatYYYYMMDDHHmm} from '../../Dates';
-import {ms} from '../../Routes';
-import {Api, ApiDto, MicroServiceState, Project, ProjectDto, TableDto, VersionDto} from "./types";
-import {RootState} from "../types";
+import {format, formatYYYYMMDDHHmm} from 'src/Dates';
+import {ms} from 'src/Routes';
+import {Api, ApiDto, MicroServiceState, Project, ProjectDto, TableDto, VersionDto} from './types';
+import {RootState} from 'src/store/types';
 
 const sortApis = (a: ApiDto, b: ApiDto) => a.absolutePath.localeCompare(b.absolutePath);
 
@@ -23,6 +23,7 @@ const depTootip = (attr: string[]) => {
 };
 
 function toProjectSummary(l: Project[]): ProjectDto[] {
+  console.log(l)
   if (!l) {
     return [];
   }
@@ -38,7 +39,7 @@ function toProjectSummary(l: Project[]): ProjectDto[] {
       return {...p, destinationUrl, snapshot, release, javaDeps, npmDeps, npmDepsTootip, latest, tables} as ProjectDto;
     }
   );
-};
+}
 
 
 export const getters: GetterTree<MicroServiceState, RootState> = {

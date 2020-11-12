@@ -42,6 +42,7 @@
         name: 'script', align: 'left', label: 'Script\'s name', field: 'script', sortable: true,
       },
     ];
+
     @server.Getter(flyway) flyway;
   }
 </script>

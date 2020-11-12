@@ -1,18 +1,6 @@
-export interface MicroServiceState {
-  tables: Table[]
-  apis: Api[],
-  projects: Project[],
-  project: Project,
-  versions: Version[],
-}
-
 export interface Table {
   latestUpdate: number
   name: string
-}
-
-export interface TableDto extends Table {
-  latest: string
 }
 
 export interface Api {
@@ -20,12 +8,6 @@ export interface Api {
   path: string
   params: string
 
-}
-
-export interface ApiDto extends Api {
-  absolutePath: string
-  queryParams: string[]
-  latestUpdate: number
 }
 
 export interface Project {
@@ -41,12 +23,6 @@ export interface Project {
   latestUpdate: number
 }
 
-export interface ProjectDto extends Project {
-  destinationUrl: string
-  npmDepsTootip: string
-  latest: string
-}
-
 export interface Version {
   id: string
   name: string
@@ -58,6 +34,36 @@ export interface Version {
   isSnapshot: boolean
 
 }
+
+export interface MicroServiceState {
+  tables: Table[]
+  apis: Api[],
+  projects: Project[],
+  project: Project,
+  versions: Version[],
+}
+
+
+export interface TableDto extends Table {
+  latest: string
+}
+
+
+export interface ApiDto extends Api {
+  absolutePath: string
+  queryParams: string[]
+  latestUpdate: number
+  method: string
+  comment: string
+}
+
+
+export interface ProjectDto extends Project {
+  destinationUrl: string
+  npmDepsTootip: string
+  latest: string
+}
+
 
 export interface VersionDto extends Version {
   latest: string

@@ -1,13 +1,15 @@
+import {Route} from 'vue-router';
+
 export const CONTEXT_ROUTE = '/rt';
 export const CONTEXT_MS = '/rt/ms';
 export const CONTEXT_FRONT = '/rt/app';
 
 
-export const path = p => `${CONTEXT_ROUTE}${p}`;
-export const ms = p => `${CONTEXT_MS}${p}`;
-export const front = p => `${CONTEXT_FRONT}${p}`;
-export const isMicroService = $route => $route.path.indexOf(CONTEXT_MS) !== -1;
-export const isFront = $route => $route.path.indexOf(CONTEXT_FRONT) !== -1;
+export const path = (p:string) => `${CONTEXT_ROUTE}${p}`;
+export const ms = (p:string) => `${CONTEXT_MS}${p}`;
+export const front = (p:string) => `${CONTEXT_FRONT}${p}`;
+export const isMicroService = ($route: Route) => $route.path.indexOf(CONTEXT_MS) !== -1;
+export const isFront = ($route: Route) => $route.path.indexOf(CONTEXT_FRONT) !== -1;
 
 // List of routes
 export const Welcome = path('/welcome');

@@ -1,8 +1,3 @@
-export interface FrontsState {
-  resume: Fronts[],
-  services: string[],
-  fronts: Fronts[],
-}
 
 export interface Fronts {
   groupId: string
@@ -13,6 +8,12 @@ export interface Fronts {
   snapshotVersion?: string
   releaseVersion?: string
   packageJson: any
+}
+
+export interface FrontsState {
+  resume: Fronts[],
+  services: string[],
+  fronts: Fronts[],
 }
 
 export interface FrontResume extends Fronts {

@@ -1,12 +1,12 @@
 <template>
-  <q-chip :icon="icon" :color="color">
+  <q-chip :icon="icon" :color="color" text-color="white">
     {{method}}
   </q-chip>
 </template>
 <script lang="ts">
   import Vue from 'vue'
   import Component from 'vue-class-component';
-  import {Prop} from "vue-property-decorator";
+  import {Prop} from 'vue-property-decorator';
 
   @Component
   export default class MethodIcon extends Vue {

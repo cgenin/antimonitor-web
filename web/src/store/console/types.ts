@@ -1,8 +1,3 @@
-export interface ConsoleState {
-  messages: Message[]
-  isListening: boolean
-}
-
 export interface Message {
   msg: string
   date: number
@@ -10,3 +5,9 @@ export interface Message {
   formattedDate?: string
   type?: string
 }
+
+export interface ConsoleState {
+  messages: Message[]
+  isListening: boolean
+}
+

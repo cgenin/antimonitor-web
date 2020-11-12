@@ -22,6 +22,7 @@ function addMarkdownPage(cfg) {
       loader: 'raw-loader'
     });
 }
+
 function add_linter(cfg) {
   cfg.module.rules.push({
     enforce: 'pre',
@@ -35,20 +36,26 @@ function definedChunkFileName(cfg) {
   if (cfg.output)
     cfg.output.chunkFilename = 'js/[name].[id].[chunkhash:8].js';
 }
+
 module.exports = function (ctx) {
   return {
     // app plugins (/src/plugins)
-    plugins: [],
+    boot: [],
     css: [
       'app.styl'
     ],
     extras: [
-      ctx.theme.mat ? 'roboto-font' : null,
+      'roboto-font',
       'material-icons',
       //'ionicons',
       // 'mdi',
-      'fontawesome'
+      'fontawesome-v5'
     ],
+    supportTS: {
+      tsCheckerConfig: {
+        eslint: true
+      }
+    },
     supportIE: false,
     build: {
       scopeHoisting: true,
@@ -58,10 +65,10 @@ module.exports = function (ctx) {
       // useNotifier: false,
       extendWebpack(cfg) {
         addMarkdownPage(cfg);
-       // add_linter(cfg);
+        // add_linter(cfg);
         definedChunkFileName(cfg);
         stripMoment(cfg);
-        extendTypescriptToWebpack(cfg);
+        //extendTypescriptToWebpack(cfg);
       }
     },
     devServer: {
@@ -82,11 +89,11 @@ module.exports = function (ctx) {
     },
     // framework: 'all' --- includes everything; for dev only!
     framework: {
-      i18n: 'fr',
+      lang: 'fr',
       components: [
         'QLayout',
-        'QLayoutHeader',
-        'QLayoutDrawer',
+        'QHeader',
+        'QDrawer',
         'QPageContainer',
         'QPage',
         'QToolbar',
@@ -95,25 +102,22 @@ module.exports = function (ctx) {
         'QBtnGroup',
         'QIcon',
         'QList',
-        'QListHeader',
+        'QItemLabel',
         'QItem',
-        'QItemMain',
-        'QItemSide',
-        'QItemSeparator',
+        'QItemSection',
+        'QSeparator',
         'QTabs',
         'QRouteTab',
         'QCard',
-        'QCardTitle',
-        'QCardMain',
+        'QCardSection',
         'QCarousel',
-        'QCardSeparator',
-        'QCollapsible',
+        'QExpansionItem',
         'QPageSticky',
         'QCardActions',
         'QTooltip',
         'QInput',
-        'QModal',
-        'QModalLayout',
+        'QDialog',
+        'QLayout',
         'QInnerLoading',
         'QSpinnerGears',
         'QSpinnerDots',
@@ -124,14 +128,9 @@ module.exports = function (ctx) {
         'QTd',
         'QToggle',
         'QSelect',
-        'QSearch',
         'QField',
         'QChip',
-        'QChipsInput',
         'QRadio',
-        'QAlert',
-        'QAutocomplete',
-        'QTableColumns',
         'QBreadcrumbs',
         'QBreadcrumbsEl',
         'QTree'

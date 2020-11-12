@@ -10,7 +10,7 @@ export const state: DependenciesState = {
   resources: [],
 };
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 const dependencies: Module<DependenciesState, RootState> = {
   namespaced,

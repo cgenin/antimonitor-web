@@ -4,13 +4,15 @@ import { UPDATE } from './mutations-type';
 import { initialize, save } from './constants';
 
 import { setUrlMutation } from '../moniThor/constants';
-import {RootState} from "../types";
+import {RootState} from '../types';
+
 export const actions: ActionTree<ConfiguationState, RootState> = {
   [initialize]({ commit }) {
     return fetch('/api/configuration')
       .then(res => res.json())
       .then((content) => {
         commit(UPDATE, content);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         commit(setUrlMutation, content.moniThorUrl, { root: true });
       });
   },
@@ -23,6 +25,7 @@ export const actions: ActionTree<ConfiguationState, RootState> = {
     })
       .then(() => {
         commit(UPDATE, configuration);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         commit(setUrlMutation, configuration.moniThorUrl, { root: true });
         return configuration;
       });

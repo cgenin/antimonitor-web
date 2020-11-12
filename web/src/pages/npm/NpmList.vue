@@ -3,11 +3,11 @@
     <header-app :bc-datas="[{icon:'view_list', label:'Liste des Projets NPM'}]"></header-app>
 
     <q-card>
-      <q-card-title>
+      <q-card-section>
         <h3>Liste des Projets NPM</h3>
-      </q-card-title>
-      <q-card-separator></q-card-separator>
-      <q-card-main>
+      </q-card-section>
+      <q-separator></q-separator>
+      <q-card-section>
         <div v-if="list">
           <q-table
             :data="list"
@@ -21,22 +21,27 @@
             :rowsPerPageOptions="rowsPerPageOptions"
             @refresh="refresh"
           >
-            <template slot="top-left" slot-scope="props">
-              <q-search
+            <template slot="top-left" >
+              <q-input
                 v-model="filter"
+                :debounce="300"
                 class="col-auto"
-              ></q-search>
+              >
+                <template v-slot:append>
+                  <q-icon name="search"/>
+                </template>
+              </q-input>
             </template>
-            <template slot="top-right" slot-scope="props">
+            <template slot="top-right" >
               <q-select
                 color="secondary"
                 v-model="separator"
                 :options="separatorOptions"
-                hide-underline
+                emit-value
               ></q-select>
             </template>
             <q-td slot="body-cell-readme" slot-scope="props" :props="props">
-              <markdown-button title="Readme" color="tertiary" icon="description" :key="props.row.id"
+              <markdown-button title="Readme" color="accent" icon="description" :key="props.row.id"
                                :content="props.value"
                                v-if="props.value !== 'ERROR: No README data found!'"></markdown-button>
             </q-td>
@@ -45,149 +50,166 @@
             </q-td>
           </q-table>
         </div>
-      </q-card-main>
+      </q-card-section>
     </q-card>
   </div>
 </template>
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import {namespace} from 'vuex-class';
-  import {getNpmComponentInfos, loadNpmList, nameModule} from '../../store/moniThor/constants';
-  import MarkdownButton from '../../components/MarkdownButton';
-  import HeaderApp from '../../components/HeaderApp';
-  import filtering from '../../FiltersAndSorter';
-  import {
-    noData,
-    noDataAfterFiltering,
-    pagination,
-    rowsPerPageOptions,
-    separator,
-    separatorOptions,
-  } from '../../datatable-utils';
-  import {formatYYYYMMDDHHmm} from '../../Dates';
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {namespace} from 'vuex-class';
+import {getNpmComponentInfos, loadNpmList, nameModule} from 'src/store/moniThor/constants';
+import MarkdownButton from '../../components/MarkdownButton.vue';
+import HeaderApp from '../../components/HeaderApp.vue';
+import filtering from '../../FiltersAndSorter';
+import {
+  noData,
+  noDataAfterFiltering,
+  pagination,
+  rowsPerPageOptions,
+  separator,
+  separatorOptions,
+} from 'src/datatable-utils';
+import {formatYYYYMMDDHHmm} from 'src/Dates';
 
-  const monithorStore = namespace(nameModule);
-  const objectAsArray = obj => Object.keys(obj).map(key => obj[key]);
+const monithorStore = namespace(nameModule);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const objectAsArray: (object) => any[] = obj => Object.keys(obj).map(key => obj[key]);
 
-  interface BuildTime {
-    [key:string]:string
-  }
+interface BuildTime {
+  [key: string]: string
+}
 
-  const getBuildTime = (component: any) => {
-    const v:BuildTime = component.versions;
-    return Object.values(v)
-      .reverse()
-      .reduce((a: string, b: string) => `
+const getBuildTime = (component: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const v: BuildTime = component.versions;
+  return Object.values(v)
+    .reverse()
+    .reduce((a: string, b: string) => `
     ${a}
     ### ${b}
     Build time : ${component.time[b] ? formatYYYYMMDDHHmm(component.time[b]) : ''}
     `, '');
-  };
-  const createInfos = component => `
+};
+const createInfos = component => {
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions,no-undef
+  const description:string = component.description;
+  return `
     ## Description
-    ${component.description}
+    ${description}
     ## Versions
         ${getBuildTime(component)}`;
+};
 
-  @Component({
-    components: {
-      HeaderApp,
-      MarkdownButton,
+@Component({
+  components: {
+    HeaderApp,
+    MarkdownButton,
+  },
+})
+export default class NpmList extends Vue {
+  list = null;
+  selected = null;
+  loading = false;
+  filter = '';
+  separator = separator;
+  separatorOptions = separatorOptions;
+  pagination = pagination;
+  noData = noData;
+  noDataAfterFiltering = noDataAfterFiltering;
+  rowsPerPageOptions = rowsPerPageOptions;
+  columns = [
+    {
+      label: 'Nom',
+      field: 'name',
+      name: 'name',
+      width: '270px',
+      sortable: true,
+      type: 'string',
+      filter: true,
     },
-  })
-  export default class NpmList extends Vue {
-    list = null;
-    selected = null;
-    loading = false;
-    filter = '';
-    separator = separator;
-    separatorOptions = separatorOptions;
-    pagination = pagination;
-    noData = noData;
-    noDataAfterFiltering = noDataAfterFiltering;
-    rowsPerPageOptions = rowsPerPageOptions;
-    columns = [
-      {
-        label: 'Nom',
-        field: 'name',
-        name: 'name',
-        width: '270px',
-        sortable: true,
-        type: 'string',
-        filter: true,
-      },
-      {
-        label: 'Version',
-        field: 'latestVersion',
-        name: 'latestVersion',
-        sortable: true,
-        type: 'string',
-        filter: true,
-      },
-      {
-        label: 'Build time',
-        field: 'latestBuildTime',
-        name: 'latestBuildTime',
-        sortable: true,
-        type: 'string',
-        filter: true,
-      },
-      {
-        label: 'Readme',
-        field: 'readme',
-        name: 'readme',
-        width: '57px',
-        sortable: true,
-      },
-      {
-        label: 'Détail',
-        field: 'infos',
-        name: 'infos',
-        width: '67px',
-        sortable: false,
-      },
-    ];
-    @monithorStore.Action(loadNpmList) loadNpmList;
-    @monithorStore.Action(getNpmComponentInfos) getNpmComponentInfos;
-    private original: any[];
+    {
+      label: 'Version',
+      field: 'latestVersion',
+      name: 'latestVersion',
+      sortable: true,
+      type: 'string',
+      filter: true,
+    },
+    {
+      label: 'Build time',
+      field: 'latestBuildTime',
+      name: 'latestBuildTime',
+      sortable: true,
+      type: 'string',
+      filter: true,
+    },
+    {
+      label: 'Readme',
+      field: 'readme',
+      name: 'readme',
+      width: '57px',
+      sortable: true,
+    },
+    {
+      label: 'Détail',
+      field: 'infos',
+      name: 'infos',
+      width: '67px',
+      sortable: false,
+    },
+  ];
 
-    async refresh() {
-      this.filter = '';
-      const obj = await this.loadNpmList();
-      this.list = objectAsArray(obj)
-        .filter(component => component.name)
-        .map((el) => {
-          const latestBuild = (el['dist-tags'] || {}).latest;
-          return {
-            ...el,
-            latestVersion: latestBuild,
-            latestBuildTime: formatYYYYMMDDHHmm(new Date(el.time[latestBuild])),
-            infos: createInfos(el),
-          };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name));
-      this.original = this.list;
-    }
+  @monithorStore.Action(loadNpmList) loadNpmList: () => Promise<any>;
 
-    async selectComponent(component) {
-      this.loading = true;
-      try {
-        this.selected = await this.getNpmComponentInfos(component);
-      } catch (e) {
-        console.error(e);
-      }
-      this.loading = false;
-    }
+  @monithorStore.Action(getNpmComponentInfos) getNpmComponentInfos: (string) => Promise<any>;
 
-    filtering() {
-      this.list = filtering(this.original, this.filter);
-    }
+  private original: any[];
 
-    async mounted() {
-      this.refresh();
-    }
+  async refresh() {
+    this.filter = '';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const obj = await this.loadNpmList();
+    this.list = objectAsArray(obj)
+      .filter(component => component.name)
+      .map((el) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const latestVersion = (el['dist-tags'] || {}).latest;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const latestBuildTime = formatYYYYMMDDHHmm(new Date(el.time[latestVersion]));
+        return {
+          ...el,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          latestVersion,
+          latestBuildTime,
+          infos: createInfos(el),
+        };
+      })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      .sort((a, b) => a.name.localeCompare(b.name));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.original = this.list;
   }
+
+  async selectComponent(component:string) {
+    this.loading = true;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      this.selected = await this.getNpmComponentInfos(component);
+    } catch (e) {
+      console.error(e);
+    }
+    this.loading = false;
+  }
+
+  filtering() {
+    this.list = filtering(this.original, this.filter);
+  }
+
+  async mounted() {
+    await this.refresh();
+  }
+}
 </script>
 <style>
 </style>

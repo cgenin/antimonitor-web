@@ -3,27 +3,30 @@
     <header-app :bc-datas="[{icon:'explore', label:'Liste des Apis'}]"/>
 
     <q-card>
-      <q-card-title>
+      <q-card-section>
         <h3>Liste des apis</h3>
-      </q-card-title>
-      <q-card-separator/>
-      <q-card-main>
+      </q-card-section>
+      <q-separator/>
+      <q-card-section>
         <div class="inputs">
-          <q-field
-            icon="search">
+          <q-field>
             <q-input
               v-model="filter"
               type="text"
               class="filter"
               :autofocus="true"
-              float-label="Filtrer"
-              @input="filtering"></q-input>
+              label="Filtrer"
+              @input="filtering">
+              <template v-slot:prepend>
+                <q-icon name="search"/>
+              </template>
+            </q-input>
           </q-field>
           <div class="column">
             <label>Affichage :</label>
-            <q-toggle @input="changedTable" v-model="viewTable" label="table" color="tertiary"></q-toggle>
-            <q-toggle @input="changedCard" v-model="viewCard" label="carte" color="tertiary"></q-toggle>
-            <q-toggle @input="changedTree" v-model="viewTree" label="arbre" color="tertiary"></q-toggle>
+            <q-toggle @input="changedTable" v-model="viewTable" label="table" color="accent"></q-toggle>
+            <q-toggle @input="changedCard" v-model="viewCard" label="carte" color="accent"></q-toggle>
+            <q-toggle @input="changedTree" v-model="viewTree" label="arbre" color="accent"></q-toggle>
           </div>
         </div>
         <div class="inputs">
@@ -33,19 +36,19 @@
         </div>
         <div v-if="filtersPanel" class="inputs inputs-panel" v-bind:class="{ open: filtersPanel }">
           <q-select
-            float-label="Méthode"
+            label="Méthode"
             v-model="subFilters.method"
             :options="methodsOptions"
             @input="filtering"
             class="field-input"></q-select>
-          <q-input @input="filtering" type="text" float-label="Path" v-model="subFilters.path"
+          <q-input @input="filtering" type="text" label="Path" v-model="subFilters.path"
                    class="field-input"></q-input>
-          <q-input @input="filtering" type="text" float-label="Domaine" v-model="subFilters.domain"
+          <q-input @input="filtering" type="text" label="Domaine" v-model="subFilters.domain"
                    class="field-input"></q-input>
         </div>
-        <q-card-separator></q-card-separator>
+        <q-separator></q-separator>
         <div class="results-number">
-          <p class="caption">Résultat : {{datas.length}}</p>
+          <p class="caption">Résultat : {{ datas.length }}</p>
         </div>
         <q-inner-loading :visible="loading">
           <q-spinner-gears size="50px" color="primary"></q-spinner-gears>
@@ -58,11 +61,17 @@
           >
             <q-list>
               <q-item v-for="api in datas" class="list-apis-table" :key="`table-${api.method}-${api.absolutePath}`">
-                <q-item-side>
+                <q-item-section avatar>
                   <method-icon :method="api.method"></method-icon>
-                </q-item-side>
-                <q-item-main :label="api.path" :sublabel="api.comment">
-                </q-item-main>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>
+                    {{ api.path }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ api.comment }}
+                  </q-item-label>
+                </q-item-section>
               </q-item>
             </q-list>
           </transition>
@@ -73,7 +82,7 @@
             enter-active-class="animated fadeIn"
             leave-active-class="animated fadeOut"
           >
-            <q-infinite-scroll :handler="loadMore" ref="infiniteScroll">
+            <q-infinite-scroll @load="loadMore" ref="infiniteScroll">
               <div class="card-container">
                 <apis-card :api="api" v-for="api in listCards"
                            :key="`card-${api.method}-${api.absolutePath}`"></apis-card>
@@ -99,7 +108,7 @@
                 <method-icon :method="prop.node.method" v-if="prop.node.method"></method-icon>
                 <q-item-side icon="help" v-if="prop.node.comment">
                   <q-tooltip>
-                    {{prop.node.comment}}
+                    {{ prop.node.comment }}
                   </q-tooltip>
                 </q-item-side>
               </div>
@@ -107,198 +116,202 @@
             </q-tree>
           </transition>
         </div>
-      </q-card-main>
+      </q-card-section>
     </q-card>
   </div>
 </template>
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import {namespace} from 'vuex-class';
-  import {apis, loadApis, nameModule as namespaceMicroService,} from '../store/microservices/constants';
-  import filtering, {filteringByAttribute} from '../FiltersAndSorter';
-  import MethodIcon from '../components/MethodIcon';
-  import ApisCard from '../components/ApisCard';
-  import HeaderApp from '../components/HeaderApp';
-  import {ApiDto, Pagination} from "../store/microservices/types";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {namespace} from 'vuex-class';
+import {apis, loadApis, nameModule as namespaceMicroService} from '../store/microservices/constants';
+import filtering, {filteringByAttribute} from '../FiltersAndSorter';
+import MethodIcon from '../components/MethodIcon.vue';
+import ApisCard from '../components/ApisCard.vue';
+import HeaderApp from '../components/HeaderApp.vue';
+import {ApiDto, Pagination} from '../store/microservices/types';
 
-  const microServicesStore = namespace(namespaceMicroService);
-  const methodFiltering = filteringByAttribute('method');
-  const artifactIdFiltering = filteringByAttribute('artifactId');
-  const absolutePathFiltering = filteringByAttribute('absolutePath');
+const microServicesStore = namespace(namespaceMicroService);
+const methodFiltering = filteringByAttribute('method');
+const artifactIdFiltering = filteringByAttribute('artifactId');
+const absolutePathFiltering = filteringByAttribute('absolutePath');
 
-  const maxLoadedCard = 20;
+const maxLoadedCard = 20;
 
-  const adaptForQTree = (entry = {}, i) => Object
-    .keys(entry)
-    .map((k, index) => {
-      if (k === 'method' || k === 'comment') {
-        return null;
+const adaptForQTree = (entry = {}, i: number) => Object
+  .keys(entry)
+  .map((k: string, index) => {
+    if (k === 'method' || k === 'comment') {
+      return null;
+    }
+    const nb = i + index;
+    return {
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      id: k + nb,
+      label: k,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      children: [...adaptForQTree(entry[k], nb)].filter(el => el),
+      body: 'method',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+      method: entry[k].method,
+      comment: entry[k].comment,
+      header: 'generic',
+    };
+  });
+
+const createTree = (data: ApiDto[]) => {
+  const datasPrepareAsTree = {};
+  data.forEach((api) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    datasPrepareAsTree[api.artifactId] = datasPrepareAsTree[api.artifactId] || {};
+    let previous = datasPrepareAsTree[api.artifactId];
+    api.path.split('/').forEach((entry) => {
+      if (entry) {
+        previous[entry] = previous[entry] || {};
+        previous = previous[entry];
       }
-      const nb = i + index;
-      return {
-        id: k + nb,
-        label: k,
-        children: [...adaptForQTree(entry[k], nb)].filter(el => el),
-        body: 'method',
-        method: entry[k].method,
-        comment: entry[k].comment,
-        header: 'generic',
-      };
     });
+    previous.method = api.method;
+    previous.comment = api.comment;
+  });
+  const i = 0;
+  return adaptForQTree(datasPrepareAsTree, i);
+};
 
-  const createTree = (data) => {
-    const datasPrepareAsTree = {};
-    data.forEach((api) => {
-      datasPrepareAsTree[api.artifactId] = datasPrepareAsTree[api.artifactId] || {};
-      let previous = datasPrepareAsTree[api.artifactId];
-      api.path.split('/').forEach((entry) => {
-        if (entry) {
-          previous[entry] = previous[entry] || {};
-          previous = previous[entry];
-        }
-      });
-      previous.method = api.method;
-      previous.comment = api.comment;
-    });
-    const i = 0;
-    return adaptForQTree(datasPrepareAsTree, i);
-  };
+interface SubFilterType {
+  method?: string
+  path?: string
+  domain?: string
+}
 
-  interface SubFilterType {
-    method?: string
-    path?: string
-    domain?: string
-  }
+@Component({
+  components: {
+    HeaderApp,
+    MethodIcon,
+    ApisCard,
+  },
+})
+export default class ApisList extends Vue {
+  loading = false;
+  nb = 25;
+  filter = '';
+  page = 1;
+  datas = [];
+  datasAsTree = {};
+  listCards = [];
+  viewTable = true;
+  viewTree = false;
+  viewCard = false;
+  filtersPanel = false;
+  subFilters: SubFilterType = {};
+  methodsOptions = [
+    '',
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'HEAD',
+  ];
 
-  @Component({
-    components: {
-      HeaderApp,
-      MethodIcon,
-      ApisCard,
+  columns = [
+    {
+      label: 'Méthode',
+      name: 'method',
+      field: 'nmethod',
+      align: 'left',
+      sortable: true,
     },
-  })
-  export default class ApisList extends Vue {
-    loading = false;
-    nb = 25;
-    filter = '';
-    page = 1;
-    datas = [];
-    datasAsTree = {};
-    listCards = [];
-    viewTable = true;
-    viewTree = false;
-    viewCard = false;
-    filtersPanel = false;
-    subFilters: SubFilterType = {};
-    methodsOptions = [
-      {label: '', value: null},
-      {label: 'GET', value: 'GET'},
-      {label: 'POST', value: 'POST'},
-      {label: 'PUT', value: 'PUT'},
-      {label: 'DELETE', value: 'DELETE'},
-      {label: 'HEAD', value: 'HEAD'},
-    ];
-    columns = [
-      {
-        label: 'Méthode',
-        name: 'method',
-        field: 'nmethod',
-        align: 'left',
-        sortable: true,
-      },
-      {
-        label: 'Path',
-        name: 'path',
-        field: 'path',
-        align: 'left',
-        sortable: true,
-      },
-      {
-        label: 'Commentaire',
-        name: 'comment',
-        field: 'comment',
-        align: 'left',
-        sortable: true,
-      },
-    ];
+    {
+      label: 'Path',
+      name: 'path',
+      field: 'path',
+      align: 'left',
+      sortable: true,
+    },
+    {
+      label: 'Commentaire',
+      name: 'comment',
+      field: 'comment',
+      align: 'left',
+      sortable: true,
+    },
+  ];
 
-    @microServicesStore.Getter(apis) apis: ApiDto[];
-    @microServicesStore.Action(loadApis) loadApis: (p: Pagination) => Promise<void>;
+  @microServicesStore.Getter(apis) apis: ApiDto[];
+  @microServicesStore.Action(loadApis) loadApis: (p: Pagination) => Promise<void>;
 
 
-    showOrHideFilterPanel() {
-      this.filtersPanel = !this.filtersPanel;
-      if (!this.filtersPanel) {
-        this.subFilters = {};
-        this.filtering();
-      }
-    }
-
-    filtering() {
-      const mF = methodFiltering(this.apis, this.subFilters.method);
-      const aF = absolutePathFiltering(mF, this.subFilters.path);
-      const aiF = artifactIdFiltering(aF, this.subFilters.domain);
-      this.datas = filtering(aiF, this.filter);
-      this.listCards = this.datas.filter((o, index) => index < maxLoadedCard);
-      this.datasAsTree = createTree(this.datas);
-    }
-
-    loadMore(index, done) {
-      if (index < (this.datas.length - 1)) {
-        if ((index + maxLoadedCard) >= this.datas.length) {
-          this.listCards = this.datas;
-        } else {
-          this.listCards = this.datas
-            .filter((o, i) => i < index + maxLoadedCard);
-        }
-        done();
-      } else {
-        if (this.listCards.length !== this.datas.length) {
-          this.listCards = this.datas;
-        }
-        done(true);
-        (<any>this.$refs.infiniteScroll).stop();
-      }
-    }
-
-    changedTable(v) {
-      if (!v) {
-        this.viewTable = true;
-      }
-      this.viewTree = false;
-      this.viewCard = false;
-    }
-
-    changedCard(v) {
-      if (!v) {
-        this.viewCard = true;
-      }
-      this.viewTable = false;
-      this.viewTree = false;
-    }
-
-    changedTree(v) {
-      if (!v) {
-        this.viewTree = true;
-      }
-      this.viewTable = false;
-      this.viewCard = false;
-    }
-
-    mounted() {
-      this.loading = true;
-      const {nb, page} = this;
-      this.loadApis(<Pagination>{nb, page})
-        .then(() => {
-          this.loading = false;
-          this.datas = this.apis;
-          this.listCards = this.datas.filter((o, index) => index < maxLoadedCard);
-          this.datasAsTree = createTree(this.apis);
-        });
+  showOrHideFilterPanel() {
+    this.filtersPanel = !this.filtersPanel;
+    if (!this.filtersPanel) {
+      this.subFilters = {};
+      this.filtering();
     }
   }
+
+  filtering() {
+    const mF = methodFiltering(this.apis, this.subFilters.method);
+    const aF = absolutePathFiltering(mF, this.subFilters.path);
+    const aiF = artifactIdFiltering(aF, this.subFilters.domain);
+    this.datas = filtering(aiF, this.filter);
+    this.listCards = this.datas.filter((o, index) => index < maxLoadedCard);
+    this.datasAsTree = createTree(this.datas);
+  }
+
+  loadMore(index: number, done: () => void) {
+    if (index < (this.datas.length - 1)) {
+      if ((index + maxLoadedCard) >= this.datas.length) {
+        this.listCards = this.datas;
+      } else {
+        this.listCards = this.datas
+          .filter((o, i) => i < index + maxLoadedCard);
+      }
+      done();
+    } else {
+      if (this.listCards.length !== this.datas.length) {
+        this.listCards = this.datas;
+      }
+      // done(true);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      (<any>this.$refs.infiniteScroll).stop();
+    }
+  }
+
+  changedTable(v) {
+    if (!v) {
+      this.viewTable = true;
+    }
+    this.viewTree = false;
+    this.viewCard = false;
+  }
+
+  changedCard(v) {
+    if (!v) {
+      this.viewCard = true;
+    }
+    this.viewTable = false;
+    this.viewTree = false;
+  }
+
+  changedTree(v) {
+    if (!v) {
+      this.viewTree = true;
+    }
+    this.viewTable = false;
+    this.viewCard = false;
+  }
+
+  async mounted() {
+    this.loading = true;
+    const {nb, page} = this;
+    await this.loadApis(<Pagination>{nb, page});
+    this.loading = false;
+    this.datas = this.apis;
+    this.listCards = this.datas.filter((o, index) => index < maxLoadedCard);
+    this.datasAsTree = createTree(this.apis);
+  }
+}
 </script>
 <style lang="stylus">
-  @import "../css/pages/apilist.styl"
+@import "../css/pages/apilist.styl"
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="page-list">
     <q-card>
-      <q-card-main>
+      <q-card-section>
         <transition
           appear
           enter-active-class="animated fadeIn"
@@ -21,28 +21,44 @@
                 :no-results-label="noDataAfterFiltering"
                 :rowsPerPageOptions="rowsPerPageOptions"
                 @refresh="refresh">
-                <template slot="top-left" slot-scope="props">
-                  <q-search
-                    v-model="filter"
-                    class="col-auto"
-                  />
-                </template>
-                <template slot="top-right" slot-scope="props">
-                  <q-table-columns
-                    class="q-mr-sm"
-                    v-model="visibleColumns"
-                    :columns="columns"
-                  />
-                  <q-select
-                    color="secondary"
-                    v-model="separator"
-                    :options="separatorOptions"
-                    hide-underline
-                  />
+                <template slot="top">
+                  <div style="min-width:60vw; display: flex;justify-content: space-around; align-items: center">
+                    <q-select
+                      color="secondary"
+                      v-model="separator"
+                      :options="separatorOptions"
+                      hide-underline
+                      dense
+                      options-dense
+                      emit-value
+                    />
+
+                    <q-input dense debounce="300"
+                             v-model="filter"
+                             class="search-on-table"
+                    >
+                      <template v-slot:append>
+                        <q-icon name="search"/>
+                      </template>
+                    </q-input>
+
+                    <q-select
+                      v-model="visibleColumns"
+                      multiple
+                      dense
+                      options-dense
+                      :display-value="$q.lang.table.columns"
+                      emit-value
+                      map-options
+                      :options="columns"
+                      option-value="name"
+                      options-cover
+                    />
+                  </div>
                 </template>
                 <q-td slot="body-cell-services" slot-scope="props" :props="props">
                   <ul>
-                    <li v-for="s in props.value" :key="s">{{s}}</li>
+                    <li v-for="s in props.value" :key="s">{{ s }}</li>
                   </ul>
                 </q-td>
               </q-table>
@@ -52,106 +68,111 @@
         <q-inner-loading :visible="loading">
           <q-spinner-gears size="50px" color="primary"/>
         </q-inner-loading>
-      </q-card-main>
+      </q-card-section>
     </q-card>
   </div>
 </template>
 <script lang="ts">
-  import Vue from 'vue';
-  import Component from 'vue-class-component';
-  import {namespace} from 'vuex-class';
-  import {loadTables, nameModule, tables,} from '../../store/microservices/constants';
-  import {sortString} from '../../FiltersAndSorter';
-  import {
-    noData,
-    noDataAfterFiltering,
-    pagination,
-    rowsPerPageOptions,
-    separator,
-    separatorOptions
-  } from '../../datatable-utils';
-  import {TableDto} from "../../store/microservices/types";
+import Vue from 'vue';
+import Component from 'vue-class-component';
+import {namespace} from 'vuex-class';
+import {loadTables, nameModule, tables, } from 'src/store/microservices/constants';
+import {sortString} from 'src/FiltersAndSorter';
+import {
+  noData,
+  noDataAfterFiltering,
+  pagination,
+  rowsPerPageOptions,
+  separator,
+  separatorOptions
+} from 'src/datatable-utils';
+import {TableDto} from 'src/store/microservices/types';
 
-  const microservices = namespace(nameModule);
+const microservices = namespace(nameModule);
 
-  @Component
-  export default class TablesList extends Vue {
-    filter= '';
-    loading= false;
-    pagination = pagination;
-    separator = separator;
-    separatorOptions = separatorOptions;
-    rowsPerPageOptions = rowsPerPageOptions;
-    visibleColumns= ['name', 'services', 'latest'];
-    noData = noData;
-    noDataAfterFiltering = noDataAfterFiltering;
-    columns = [
-      {
-        label: 'Nom',
-        name: 'name',
-        field: 'name',
-        align: 'left',
-        width: '400px',
-        sortable: true,
-        type: 'string',
-        filter: true,
+@Component
+export default class TablesList extends Vue {
+  filter = '';
+  loading = false;
+  pagination = pagination;
+  separator = separator;
+  separatorOptions = separatorOptions;
+  rowsPerPageOptions = rowsPerPageOptions;
+  visibleColumns = ['name', 'services', 'latest'];
+  noData = noData;
+  noDataAfterFiltering = noDataAfterFiltering;
+  columns = [
+    {
+      label: 'Nom',
+      name: 'name',
+      field: 'name',
+      align: 'left',
+      width: '400px',
+      sortable: true,
+      type: 'string',
+      filter: true,
+    },
+    {
+      label: 'Projet(s) lié(s)',
+      name: 'services',
+      field: 'services',
+      align: 'left',
+      width: '380px',
+      filter: true,
+      sort(a: string, b: string) {
+        if (a.length === b.length) {
+          return sortString(a[0], b[0]);
+        }
+        return a.length - b.length;
       },
-      {
-        label: 'Projet(s) lié(s)',
-        name: 'services',
-        field: 'services',
-        align: 'left',
-        width: '380px',
-        filter: true,
-        sort(a: string, b: string) {
-          if (a.length === b.length) {
-            return sortString(a[0], b[0]);
-          }
-          return a.length - b.length;
-        },
-      },
-      {
-        label: 'Dernière Mise à jour',
-        name:
-          'latest',
-        field:
-          'latest',
-        align:
-          'center',
-        width:
-          '230px',
-        sortable:
-          true,
-        type:
-          'date',
-        filter:
-          true,
-      },
-    ];
+    },
+    {
+      label: 'Dernière Mise à jour',
+      name:
+        'latest',
+      field:
+        'latest',
+      align:
+        'center',
+      width:
+        '230px',
+      sortable:
+        true,
+      type:
+        'date',
+      filter:
+        true,
+    },
+  ];
 
-    @microservices.Getter(tables) tables: TableDto[];
-    @microservices.Action(loadTables) loadTables: () => Promise<void>;
+  @microservices.Getter(tables) tables: TableDto[];
+  @microservices.Action(loadTables) loadTables: () => Promise<void>;
 
-    refresh() {
+  async refresh() {
+    try {
       this.loading = true;
-      this.loadTables()
-        .then(() => {
-          this.filter = '';
-          setTimeout(() => {
-            this.loading = false;
-          }, 300);
-        });
-    }
-
-    mounted() {
-      this.refresh();
+      await this.loadTables();
+      this.filter = '';
+      setTimeout(() => {
+        this.loading = false;
+      }, 300);
+    } catch (e) {
+      console.debug(e);
     }
   }
+
+  async mounted() {
+   await this.refresh();
+  }
+}
 </script>
 <style lang="stylus" scoped>
-  .page-list
-    .sql-table-and-project
-      .q-table-control
-        .q-search
-          min-width 30vw
+.page-list
+  .sql-table-and-project
+    .q-table-control
+      .q-input
+        min-width 30vw
+
+  .search-on-table
+    min-width 30vw
 </style>

@@ -2,15 +2,9 @@ package fr.genin.christophe.antimonitor.web;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
-import io.vertx.mutiny.pgclient.PgPool;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
 
@@ -18,14 +12,20 @@ import static org.hamcrest.CoreMatchers.is;
 public class WebAppsResourceTest {
 
 
+    @Test
+    public void testHealthEndpoint() {
+        given()
+                .when().get("/api/_health")
+                .then()
+                .statusCode(200);
+    }
 
     @Test
-    public void testHelloEndpoint() {
+    public void testindex() {
         given()
-          .when().get("/api/health")
-          .then()
-             .statusCode(200)
-             .body(is("{\"up\":true}"));
+                .when().get("/")
+                .then()
+                .statusCode(200);
     }
 
 }

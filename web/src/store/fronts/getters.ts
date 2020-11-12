@@ -1,9 +1,9 @@
 import {GetterTree} from 'vuex';
-import {formatDate} from 'quasar-framework/src/utils/date';
-import {RootState} from "../types";
-import {FrontResume, FrontsState} from "./types";
+import { date } from 'quasar'
+import {RootState} from '../types';
+import {FrontResume, FrontsState} from './types';
 
-const fmDate = (dt: number) => ((dt) ? formatDate(new Date(dt), 'YYYY-MM-DD HH:mm:ss') : '');
+const fmDate = (dt: number) => ((dt) ? date.formatDate(new Date(dt), 'YYYY-MM-DD HH:mm:ss') : '');
 
 export const getters: GetterTree<FrontsState, RootState> = {
   resume(state) {
@@ -20,11 +20,7 @@ export const getters: GetterTree<FrontsState, RootState> = {
   },
   nbFronts: state => state.resume.length,
 
-  services: state => state.services
-    .map(r => ({
-      label: r,
-      value: r.toUpperCase(),
-    })),
+  services: state => state.services,
 
   fronts: state => state.fronts.map(o => `${o.groupId}.${o.artifactId}`),
 };

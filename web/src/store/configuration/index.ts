@@ -7,7 +7,6 @@ import {RootState} from '../types';
 
 
 export const state: ConfiguationState = {
-  mysql: null,
   javaFilters: null,
   npmFilters: null,
   moniThorUrl: null,
@@ -15,7 +14,7 @@ export const state: ConfiguationState = {
 };
 
 
-const namespaced: boolean = true;
+const namespaced = true;
 
 const configuration: Module<ConfiguationState, RootState> = {
   namespaced,
