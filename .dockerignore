@@ -1,5 +1,5 @@
-*
-!target/*-runner
-!target/*-runner.jar
-!target/lib/*
-!target/quarkus-app/*
+.idea
+target
+web/.quasar
+web/node_modules
+web/dist
