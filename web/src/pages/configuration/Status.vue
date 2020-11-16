@@ -29,32 +29,19 @@
       </q-item>
       <div>
         <q-separator/>
-        <q-expansion-item>
-          <template slot="header">
-            <q-chip color="primary" small class="q-mr-sm">
-              Db migration.
-            </q-chip>
-            <q-item-label></q-item-label>
-            <q-item-side right>
-              if the DB must be updated or not.
-            </q-item-side>
-          </template>
+        <q-expansion-item icon="dns" class="text-primary"
+                          label="Db migration"
+                          caption="if the DB must be updated or not">
           <div>
             <db-migration></db-migration>
           </div>
         </q-expansion-item>
       </div>
       <q-separator/>
-      <q-expansion-item>
-        <template slot="header">
-          <q-chip color="primary" small class="q-mr-sm">
-            Console
-          </q-chip>
-          <q-item-label label=""/>
-          <q-item-side right>
-            Get the server's logs.
-          </q-item-side>
-        </template>
+      <q-expansion-item
+        icon="visibility" class="text-primary"
+        label="Console"
+        caption="Get the server's logs.">
         <div>
           <console></console>
         </div>

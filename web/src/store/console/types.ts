@@ -3,7 +3,7 @@ export interface Message {
   date: number
   key?: string
   formattedDate?: string
-  type?: string
+  type: string
 }
 
 export interface ConsoleState {

@@ -2,6 +2,7 @@ package fr.genin.christophe.antimonitor.web;
 
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -18,7 +19,9 @@ public class IndexHtml implements ExceptionMapper<NotFoundException> {
         String text = new Scanner(stream, StandardCharsets.UTF_8)
                 .useDelimiter("\\A")
                 .next();
-        return Response.status(404).entity(text).build();
+        return Response.status(404).entity(text)
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .build();
     }
 }
 

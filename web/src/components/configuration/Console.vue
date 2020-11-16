@@ -11,7 +11,7 @@
     </div>
     <div class="console">
       <pre>@nti-monitor ~ $ Console</pre>
-      <pre v-for="txt in messages" :key="txt.key">{{txt.formattedDate}} - {{txt.msg}}</pre>
+      <pre v-for="txt in messages" :key="txt.key">{{txt.type}} - {{txt.formattedDate}} - {{txt.msg}}</pre>
     </div>
   </q-item>
 </template>

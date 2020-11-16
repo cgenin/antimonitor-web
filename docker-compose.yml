@@ -24,6 +24,8 @@ services:
       - postgres
     depends_on:
       - postgres
+    #volumes:
+    # - ./target:/target
 
 volumes:
   postgres-data:

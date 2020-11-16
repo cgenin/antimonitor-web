@@ -25,7 +25,7 @@ COPY --from=builderServer /usr/app/target/lib/* /usr/app/lib/
 COPY --from=builderServer /usr/app/target/*-runner.jar /usr/app/app.jar
 
 EXPOSE 8080
-VOLUME /target
+#VOLUME /target
 
 
 ENTRYPOINT [ "java", "-jar", "app.jar" ]

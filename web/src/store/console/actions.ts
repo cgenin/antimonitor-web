@@ -16,7 +16,7 @@ export const actions: ActionTree<ConsoleState, RootState> = {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       eb.enableReconnect(true);
       eb.onopen = () => {
-        const messageConnected: Message = {date: new Date().getTime(), msg: 'Console connecté'};
+        const messageConnected: Message = {date: new Date().getTime(), msg: 'Console connecté', type: 'info'};
         commit(ADD_MESSAGE, messageConnected);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         eb.registerHandler('console.text', (error, message) => {
