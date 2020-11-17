@@ -1,6 +1,7 @@
 package fr.genin.christophe.antimonitor.services;
 
 import fr.genin.christophe.antimonitor.jooq.JooqFactory;
+import fr.genin.christophe.antimonitor.services.filter.ApisFilterDto;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
@@ -46,13 +47,25 @@ public class ApisService {
                 .flatMap(ROW_JSONOBJECT);
     }
 
-    public Multi<JsonObject> findPaginated(Integer queryLimit, Integer queryOffset) {
+    public Multi<JsonObject> findAllWithFilter(ApisFilterDto filter) {
+        return jooqFactory.preparedQuery(
+                dsl -> dsl.select(APIS.FULLURL, APIS.METHOD, APIS.DOCUMENT)
+                        .from(APIS)
+                        .where(filter.where(dsl))
+                        .orderBy(APIS.FULLURL, APIS.METHOD, APIS.IDPROJECT)
+        )
+                .toMulti()
+                .flatMap(ROW_JSONOBJECT);
+    }
+
+    public Multi<JsonObject> findPaginatedWithFilter(Integer queryLimit, Integer queryOffset, ApisFilterDto filter) {
         int limit = (Objects.nonNull(queryLimit)) ? queryLimit : 25;
         int offset = (Objects.nonNull(queryOffset)) ? queryOffset : 0;
 
         return jooqFactory.preparedQuery(
                 dsl -> dsl.select(APIS.FULLURL, APIS.METHOD, APIS.DOCUMENT)
                         .from(APIS)
+                        .where(filter.where(dsl))
                         .orderBy(APIS.FULLURL, APIS.METHOD, APIS.IDPROJECT)
                         .limit(limit)
                         .offset(offset)

@@ -5,9 +5,8 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-
+import static org.hamcrest.CoreMatchers.*;
 @QuarkusTest
-
 @QuarkusTestResource(DatabaseResource.class)
 public class WebAppsResourceTest {
 
@@ -21,11 +20,13 @@ public class WebAppsResourceTest {
     }
 
     @Test
-    public void testindex() {
+    public void testProjects() {
         given()
-                .when().get("/")
+                .when().get("/api/projects")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .body(equalTo("[]"))
+        ;
     }
 
 }

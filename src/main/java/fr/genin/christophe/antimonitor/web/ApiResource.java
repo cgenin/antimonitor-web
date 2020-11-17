@@ -2,6 +2,7 @@ package fr.genin.christophe.antimonitor.web;
 
 
 import fr.genin.christophe.antimonitor.services.ApisService;
+import fr.genin.christophe.antimonitor.services.filter.ApisFilterDto;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.json.JsonObject;
 
@@ -21,11 +22,16 @@ public class ApiResource {
     ApisService apisService;
 
     @GET
-    public Multi<JsonObject> findAll(@QueryParam("limit") Integer limit, @QueryParam("offset") Integer offset) {
+    public Multi<JsonObject> findAll(@QueryParam("limit") Integer limit, @QueryParam("offset") Integer offset,
+                                     @QueryParam("q") String q, @QueryParam("method") String method,
+                                     @QueryParam("domain") String domain, @QueryParam("path") String path) {
+
+        final ApisFilterDto apisFilterDto = new ApisFilterDto(q, method, domain, path);
+
         if (Objects.nonNull(limit) || Objects.nonNull(offset)) {
-            return apisService.findPaginated(limit, offset);
+            return apisService.findPaginatedWithFilter(limit, offset, apisFilterDto);
         }
-        return apisService.findAll();
+        return apisService.findAllWithFilter(apisFilterDto);
     }
 
 }
