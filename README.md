@@ -1,30 +1,58 @@
 # antimonitor-web project
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## Used library
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+This project uses 
+ - [Quarkus](https://quarkus.io/)
+ - [Jooq](https://quasar.dev/)
+ - [Quasar framework](https://quasar.dev/)
+ - [Postgres](https://quasar.dev/) 
 
 ## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
+### prerequisite
+
+Before launch or build, install : 
+- OpenJdk 11
+- Maven 3.6
+- Docker environement
+- nodejs >=12
+- yarn
+
+### Launch the database
+
+Execute the shell script :
+```/shell script
+./docker-pg.sh
 ```
-./mvnw quarkus:dev
+
+### Launch the quarkus server 
+
+Run your application in dev mode that enables live coding using:
+```/shell script
+./mvnw compile quarkus:dev
 ```
 
-## Packaging and running the application
+### launch the front-end 
 
-The application can be packaged using `./mvnw package`.
-It produces the `antimonitor-web-1.0-SNAPSHOT-runner.jar` file in the `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
+In an terminal : 
+- Go in the [web](web) directory
+- Install the libs with `yarn`
+- Execute the dev server with `yarn run dev`
 
-The application is now runnable using `java -jar target/antimonitor-web-1.0-SNAPSHOT-runner.jar`.
+After that, the application must be running on [http://localhost:9999/](http://localhost:9999/)
 
-## Creating a native executable
+## building an docker image of the web application
+In the root directory, execute :
 
-You can create a native executable using: `./mvnw package -Pnative`.
+```/shell script
+docker build -t cgenin/antimonitor .
+```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: `./mvnw package -Pnative -Dquarkus.native.container-build=true`.
 
-You can then execute your native executable with: `./target/antimonitor-web-1.0-SNAPSHOT-runner`
+## building and running an docker image with database
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image.
+In the root directory, execute :
+```/shell script
+docker-compose up
+```
